@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	dto "github.com/jonattasmoraes/titan/internal/user/domain/DTO"
 	"github.com/jonattasmoraes/titan/internal/user/domain/entities"
 	"github.com/jonattasmoraes/titan/internal/user/usecase"
 	"github.com/jonattasmoraes/titan/internal/utils"
@@ -22,7 +23,7 @@ func NewUserHandler(createUser *usecase.CreateUserUsecase, GetUserById *usecase.
 }
 
 func (h *UserHandler) CreateUser(ctx *gin.Context) {
-	var request usecase.UserDTO
+	var request dto.UserDTO
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

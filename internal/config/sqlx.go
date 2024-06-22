@@ -1,9 +1,11 @@
 package config
 
-import "github.com/jmoiron/sqlx"
+import (
+	"github.com/jmoiron/sqlx"
+)
 
-func GetReaderSqlx() (*sqlx.DB, error) {
-	reader, err := sqlx.Connect("postgres", "host=localhost port=5432 user=postgres dbname=postgres password=password sslmode=disable")
+func GetReaderSqlx(dsn string) (*sqlx.DB, error) {
+	reader, err := sqlx.Connect("postgres", dsn)
 	if err != nil {
 		return nil, err
 	}
@@ -11,8 +13,8 @@ func GetReaderSqlx() (*sqlx.DB, error) {
 	return reader, nil
 }
 
-func GetWriterSqlx() (*sqlx.DB, error) {
-	writer, err := sqlx.Connect("postgres", "host=localhost port=5432 user=postgres dbname=postgres password=password sslmode=disable")
+func GetWriterSqlx(dsn string) (*sqlx.DB, error) {
+	writer, err := sqlx.Connect("postgres", dsn)
 	if err != nil {
 		panic(err)
 	}

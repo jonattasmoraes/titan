@@ -1,19 +1,29 @@
 package main
 
 import (
+	"os"
+
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/joho/godotenv"
 	"github.com/jonattasmoraes/titan/internal/config"
 	"github.com/jonattasmoraes/titan/internal/server"
 	_ "github.com/lib/pq"
 )
 
 func main() {
-	writer, err := config.GetWriterSqlx()
+	err := godotenv.Load()
 	if err != nil {
 		panic(err)
 	}
 
-	reader, err := config.GetReaderSqlx()
+	dsn := os.Getenv("DSN")
+
+	writer, err := config.GetWriterSqlx(dsn)
+	if err != nil {
+		panic(err)
+	}
+
+	reader, err := config.GetReaderSqlx(dsn)
 	if err != nil {
 		panic(err)
 	}

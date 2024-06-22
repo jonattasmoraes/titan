@@ -2,6 +2,7 @@ package http
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	dto "github.com/jonattasmoraes/titan/internal/user/domain/DTO"
@@ -13,12 +14,14 @@ import (
 type UserHandler struct {
 	createUser  *usecase.CreateUserUsecase
 	getUserById *usecase.GetUserByIdUsecase
+	listUsers   *usecase.ListUsersUsecase
 }
 
-func NewUserHandler(createUser *usecase.CreateUserUsecase, GetUserById *usecase.GetUserByIdUsecase) *UserHandler {
+func NewUserHandler(createUser *usecase.CreateUserUsecase, GetUserById *usecase.GetUserByIdUsecase, ListUsers *usecase.ListUsersUsecase) *UserHandler {
 	return &UserHandler{
 		createUser:  createUser,
 		getUserById: GetUserById,
+		listUsers:   ListUsers,
 	}
 }
 
@@ -64,4 +67,32 @@ func (h *UserHandler) GetUserById(ctx *gin.Context) {
 	}
 
 	utils.SendSuccess(ctx, "get user by id", request, http.StatusOK)
+}
+
+func (h *UserHandler) ListUsers(ctx *gin.Context) {
+	request := ctx.DefaultQuery("page", "1")
+
+	page, err := strconv.Atoi(request)
+	if err != nil {
+		utils.SendError(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	users, err := h.listUsers.Execute(page)
+	if err != nil {
+		if err == usecase.ErrInvalidPageNumber {
+			utils.SendError(ctx, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		if err == usecase.ErrUsersNotFound {
+			utils.SendError(ctx, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		utils.SendError(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	utils.SendSuccess(ctx, "list users", users, http.StatusOK)
 }

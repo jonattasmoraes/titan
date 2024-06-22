@@ -1,17 +1,14 @@
-GET http://localhost:8080/api/users
+GET http://localhost:8080/api/users/?page=1
 
 ###
 # @name createUser
-
-###
-
-POST http://localhost:8080/api/users
+POST http://localhost:8080/api/user
 Content-Type: application/json
 
 {
     "first_name": "John",
     "last_name": "Doe",
-    "email": "johccxdxccxcd.doe@example.com",
+    "email": "joh.doe@example.com",
     "password": "my_secure_password",
     "role": "admin"
 }
@@ -20,4 +17,4 @@ Content-Type: application/json
 
 ###
 
-GET http://localhost:8080/api/user{{ userId }}
+GET http://localhost:8080/api/user/{{ userId }}

@@ -103,3 +103,43 @@ func (r *repoSqlx) FindUserByEmail(email string) (*entities.User, error) {
 
 	return &user, nil
 }
+
+func (r *repoSqlx) ListUsers(page int) ([]*entities.User, error) {
+	offset := (page - 1) * 10
+
+	query := `
+	SELECT id, first_name, last_name, email, role, created_at, updated_at
+	FROM users
+	WHERE deleted_at IS NULL
+	LIMIT 10 OFFSET $1
+	`
+
+	rows, err := r.writer.Query(query, offset)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var users []*entities.User
+
+	for rows.Next() {
+		var user entities.User
+		err := rows.Scan(
+			&user.ID,
+			&user.FirstName,
+			&user.LastName,
+			&user.Email,
+			&user.Role,
+			&user.CreatedAt,
+			&user.UpdatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		users = append(users, &user)
+	}
+
+	return users, nil
+}

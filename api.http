@@ -1,0 +1,13 @@
+POST http://localhost:8080/users
+
+{
+    "first_name": "John",
+    "last_name": "Doe",
+    "email": "john.doe@example.com",
+    "password": "my_secure_password",
+    "role": "admin"
+}
+
+###
+
+GET http://localhost:8080/users/01J1010XWDDF82BTGE7KRCDGBN

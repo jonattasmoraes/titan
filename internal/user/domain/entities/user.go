@@ -19,15 +19,6 @@ var (
 	ErrIncorrectRole       = errors.New("param: 'role' must be 'admin', 'super' or 'user', please try again")
 )
 
-func IsValidEmail(email string) bool {
-	re := regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
-	return re.MatchString(email)
-}
-
-func ErrorValidation(err error) error {
-	return err
-}
-
 type User struct {
 	ID        string
 	FirstName string
@@ -40,7 +31,7 @@ type User struct {
 	DeletedAt time.Time
 }
 
-func NewUser(id string, email string, password string, firstName string, lastName string, Role string) (*User, error) {
+func NewUser(id string, firstName string, lastName string, email string, password string, Role string, createdAt time.Time, updatedAt time.Time) (*User, error) {
 	user := &User{
 		ID:        ulid.Make().String(),
 		FirstName: firstName,
@@ -94,4 +85,13 @@ func (u *User) Validate() error {
 	}
 
 	return nil
+}
+
+func IsValidEmail(email string) bool {
+	re := regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
+	return re.MatchString(email)
+}
+
+func ErrorValidation(err error) error {
+	return err
 }

@@ -1,4 +1,4 @@
-package infra
+package repository
 
 import (
 	"github.com/jmoiron/sqlx"
@@ -7,25 +7,22 @@ import (
 	"github.com/jonattasmoraes/titan/internal/user/domain/entities"
 )
 
-type UserRepositoryPg struct {
-	WritterSqlx *sqlx.DB
-	ReaderSqlx  *sqlx.DB
+type repoSqlx struct {
+	writer *sqlx.DB
+	reader *sqlx.DB
 }
 
-func NewSqlxRepository(w *sqlx.DB, r *sqlx.DB) (domain.UserRepository, error) {
-	return &UserRepositoryPg{
-		WritterSqlx: w,
-		ReaderSqlx:  r,
-	}, nil
+func NewSqlxRepository(writer, reader *sqlx.DB) domain.UserRepository {
+	return &repoSqlx{writer: writer, reader: reader}
 }
 
-func (r *UserRepositoryPg) CreateUser(user *entities.User) error {
+func (r *repoSqlx) CreateUser(user *entities.User) error {
 	query := `
 	INSERT INTO users (id, first_name, last_name, email, password, role, created_at, updated_at)
 	VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 	`
 
-	_, err := r.WritterSqlx.Exec(query, user.ID, user.FirstName, user.LastName, user.Email, user.Password, user.Role, user.CreatedAt, user.UpdatedAt)
+	_, err := r.writer.Exec(query, user.ID, user.FirstName, user.LastName, user.Email, user.Password, user.Role, user.CreatedAt, user.UpdatedAt)
 	if err != nil {
 		return err
 	}
@@ -33,14 +30,14 @@ func (r *UserRepositoryPg) CreateUser(user *entities.User) error {
 	return nil
 }
 
-func (r *UserRepositoryPg) FindUserById(id string) (*entities.User, error) {
+func (r *repoSqlx) FindUserById(id string) (*entities.User, error) {
 	query := `
 	SELECT id, first_name, last_name, email, password, role, created_at, updated_at
 	FROM users
 	WHERE id = $1 AND deleted_at IS NULL
 	`
 
-	rows, err := r.ReaderSqlx.Query(query, id)
+	rows, err := r.reader.Query(query, id)
 
 	if err != nil {
 		return nil, err
@@ -70,14 +67,14 @@ func (r *UserRepositoryPg) FindUserById(id string) (*entities.User, error) {
 	return &user, nil
 }
 
-func (r *UserRepositoryPg) FindUserByEmail(email string) (*entities.User, error) {
+func (r *repoSqlx) FindUserByEmail(email string) (*entities.User, error) {
 	query := `
 	SELECT id, first_name, last_name, email, password, role, created_at, updated_at
 	FROM users
 	WHERE email = $1 AND deleted_at IS NULL
 	`
 
-	rows, err := r.ReaderSqlx.Query(query, email)
+	rows, err := r.reader.Query(query, email)
 
 	if err != nil {
 		return nil, err

@@ -18,6 +18,10 @@ func main() {
 		panic(err)
 	}
 
-	server.StartServer(writer, reader)
+	defer writer.Close()
+	defer reader.Close()
 
+	config.StartMigrations(writer)
+
+	server.StartServer(writer, reader)
 }

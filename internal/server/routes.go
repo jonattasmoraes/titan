@@ -8,7 +8,7 @@ import (
 	"github.com/jonattasmoraes/titan/internal/user/usecase"
 )
 
-func startRoutes(router *gin.Engine, writer, reader *sqlx.DB) {
+func startRoutes(router *gin.Engine, writer, reader *sqlx.DB) error {
 	repo := repository.NewSqlxRepository(writer, reader)
 
 	createUser := usecase.NewCreateUserUsecase(repo)
@@ -17,9 +17,10 @@ func startRoutes(router *gin.Engine, writer, reader *sqlx.DB) {
 	userHandlers := http.NewUserHandler(createUser, getUserById)
 
 	userRoutes := router.Group("/api")
-
 	{
-		userRoutes.POST("/user", userHandlers.CreateUser)
+		userRoutes.POST("/users", userHandlers.CreateUser)
 		userRoutes.GET("/users/:id", userHandlers.GetUserById)
 	}
+
+	return nil
 }

@@ -30,7 +30,13 @@ func (h *UserHandler) CreateUser(ctx *gin.Context) {
 		return
 	}
 
-	if err := h.createUser.Execute(&request); err != nil {
+	if h.createUser == nil {
+		utils.SendError(ctx, http.StatusInternalServerError, "createUser is nil")
+		return
+	}
+
+	user, err := h.createUser.Execute(&request)
+	if err != nil {
 		if err == entities.ErrorValidation(err) {
 			utils.SendError(ctx, http.StatusBadRequest, err.Error())
 			return
@@ -45,7 +51,7 @@ func (h *UserHandler) CreateUser(ctx *gin.Context) {
 		return
 	}
 
-	utils.SendSuccess(ctx, "create user", nil, http.StatusCreated)
+	utils.SendSuccess(ctx, "create user", user, http.StatusCreated)
 }
 
 func (h *UserHandler) GetUserById(ctx *gin.Context) {

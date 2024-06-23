@@ -33,13 +33,23 @@ func (u *PatchUserUsecase) Execute(user *entities.User) (*dto.UserResponseDTO, e
 
 	updatedUser := &entities.User{
 		ID:        userExists.ID,
-		FirstName: user.FirstName,
-		LastName:  user.LastName,
-		Email:     user.Email,
+		FirstName: userExists.FirstName,
+		LastName:  userExists.LastName,
+		Email:     userExists.Email,
 		Password:  userExists.Password,
 		Role:      userExists.Role,
 		CreatedAt: userExists.CreatedAt,
 		UpdatedAt: time.Now(),
+	}
+
+	if user.FirstName != "" {
+		updatedUser.FirstName = user.FirstName
+	}
+	if user.LastName != "" {
+		updatedUser.LastName = user.LastName
+	}
+	if user.Email != "" {
+		updatedUser.Email = user.Email
 	}
 
 	err = u.repo.PatchUser(updatedUser)

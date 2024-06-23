@@ -28,7 +28,7 @@ Content-Type: application/json
 {
     "first_name": "Julio",
     "last_name": "Alves",
-    "email": "julioOlder@example.com",
+    "email": "julioOlder@example.com"
 }
 
 ###

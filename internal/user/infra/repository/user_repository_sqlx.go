@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"strconv"
 	"strings"
 
 	"github.com/jmoiron/sqlx"
@@ -159,30 +160,35 @@ func (r *repoSqlx) PatchUser(user *entities.User) error {
 		UPDATE users
 		SET `)
 
+	argIndex := 1
+
 	if user.FirstName != "" {
-		query.WriteString("first_name = $1, ")
+		query.WriteString("first_name = $" + strconv.Itoa(argIndex) + ", ")
 		args = append(args, user.FirstName)
+		argIndex++
 	}
 
 	if user.LastName != "" {
-		query.WriteString("last_name = $2, ")
+		query.WriteString("last_name = $" + strconv.Itoa(argIndex) + ", ")
 		args = append(args, user.LastName)
+		argIndex++
 	}
 
 	if user.Email != "" {
-		query.WriteString("email = $3, ")
+		query.WriteString("email = $" + strconv.Itoa(argIndex) + ", ")
 		args = append(args, user.Email)
+		argIndex++
 	}
 
-	query.WriteString(`
+	finalQuery := strings.TrimSuffix(query.String(), ", ")
+
+	finalQuery += `,
 		updated_at = NOW()
-		WHERE id = $4
+		WHERE id = $` + strconv.Itoa(argIndex) + `
 		AND deleted_at IS NULL
-	`)
+	`
 
 	args = append(args, user.ID)
-
-	finalQuery := strings.TrimSuffix(query.String(), ", ")
 
 	_, err := r.writer.Exec(finalQuery, args...)
 	if err != nil {

@@ -41,14 +41,13 @@ func (r *repoSqlx) FindUserById(id string) (*entities.User, error) {
 	`
 
 	rows, err := r.reader.Query(query, id)
-
 	if err != nil {
 		return nil, err
 	}
-
 	defer rows.Close()
 
 	var user entities.User
+	found := false
 
 	for rows.Next() {
 		err := rows.Scan(
@@ -61,10 +60,14 @@ func (r *repoSqlx) FindUserById(id string) (*entities.User, error) {
 			&user.CreatedAt,
 			&user.UpdatedAt,
 		)
-
 		if err != nil {
 			return nil, err
 		}
+		found = true
+	}
+
+	if !found {
+		return nil, nil
 	}
 
 	return &user, nil
@@ -195,6 +198,21 @@ func (r *repoSqlx) PatchUser(user *entities.User) error {
 	args = append(args, user.ID)
 
 	_, err := r.writer.Exec(queryStr, args...)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *repoSqlx) DeleteUser(id string) error {
+	query := `
+	UPDATE users
+	SET deleted_at = NOW()
+	WHERE id = $1
+	`
+
+	_, err := r.writer.Exec(query, id)
 	if err != nil {
 		return err
 	}

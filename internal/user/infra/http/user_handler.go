@@ -16,6 +16,7 @@ type UserHandler struct {
 	getUserById *usecase.GetUserByIdUsecase
 	listUsers   *usecase.ListUsersUsecase
 	patchUser   *usecase.PatchUserUsecase
+	deleteUser  *usecase.DeleteUserUsecase
 }
 
 func NewUserHandler(
@@ -23,12 +24,14 @@ func NewUserHandler(
 	GetUserById *usecase.GetUserByIdUsecase,
 	ListUsers *usecase.ListUsersUsecase,
 	PatchUser *usecase.PatchUserUsecase,
+	DeleteUser *usecase.DeleteUserUsecase,
 ) *UserHandler {
 	return &UserHandler{
 		createUser:  createUser,
 		getUserById: GetUserById,
 		listUsers:   ListUsers,
 		patchUser:   PatchUser,
+		deleteUser:  DeleteUser,
 	}
 }
 
@@ -69,6 +72,10 @@ func (h *UserHandler) GetUserById(ctx *gin.Context) {
 
 	request, err := h.getUserById.Execute(id)
 	if err != nil {
+		if err == usecase.ErrUserNotFound {
+			utils.SendError(ctx, http.StatusNotFound, err.Error())
+			return
+		}
 		utils.SendError(ctx, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -139,4 +146,16 @@ func (h *UserHandler) PatchUser(ctx *gin.Context) {
 	}
 
 	utils.SendSuccess(ctx, "patch user", response, http.StatusOK)
+}
+
+func (h *UserHandler) DeleteUser(ctx *gin.Context) {
+	id := ctx.Param("id")
+
+	response, err := h.deleteUser.Execute(id)
+	if err != nil {
+		utils.SendError(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	utils.SendSuccess(ctx, "delete user", response, http.StatusOK)
 }

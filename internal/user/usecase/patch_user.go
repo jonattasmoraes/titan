@@ -1,8 +1,6 @@
 package usecase
 
 import (
-	"log"
-
 	"github.com/jonattasmoraes/titan/internal/user/domain"
 	dto "github.com/jonattasmoraes/titan/internal/user/domain/DTO"
 	"github.com/jonattasmoraes/titan/internal/user/domain/entities"
@@ -21,8 +19,6 @@ func (u *PatchUserUsecase) Execute(user *entities.User) (*dto.UserResponseDTO, e
 	if err != nil {
 		return nil, err
 	}
-
-	log.Printf("userExists: %v", userExists)
 
 	if userExists != nil && userExists.Email == user.Email {
 		return nil, ErrEmailAlreadyExists

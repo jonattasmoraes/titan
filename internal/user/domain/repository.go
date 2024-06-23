@@ -10,4 +10,5 @@ type UserRepository interface {
 	FindUserByEmail(email string) (*entities.User, error)
 	ListUsers(page int) ([]*entities.User, error)
 	PatchUser(user *entities.User) error
+	DeleteUser(id string) error
 }

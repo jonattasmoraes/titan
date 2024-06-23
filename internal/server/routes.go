@@ -15,8 +15,9 @@ func startRoutes(router *gin.Engine, writer, reader *sqlx.DB) error {
 	getUserById := usecase.NewGetUserByIdUsecase(repo)
 	listUsers := usecase.NewListUsersUsecase(repo)
 	patchUser := usecase.NewPatchUserUsecase(repo)
+	deleteUser := usecase.NewDeleteUserUsecase(repo)
 
-	userHandlers := http.NewUserHandler(createUser, getUserById, listUsers, patchUser)
+	userHandlers := http.NewUserHandler(createUser, getUserById, listUsers, patchUser, deleteUser)
 
 	userRoutes := router.Group("/api")
 	{
@@ -24,6 +25,7 @@ func startRoutes(router *gin.Engine, writer, reader *sqlx.DB) error {
 		userRoutes.GET("/user/:id", userHandlers.GetUserById)
 		userRoutes.GET("/users", userHandlers.ListUsers)
 		userRoutes.PATCH("/user/:id", userHandlers.PatchUser)
+		userRoutes.DELETE("/user/:id", userHandlers.DeleteUser)
 	}
 
 	return nil

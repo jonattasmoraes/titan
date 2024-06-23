@@ -8,8 +8,8 @@ Content-Type: application/json
 {
     "first_name": "John",
     "last_name": "Doe",
-    "email": "johx.doe@example.com",
-    "password": "my_secure_password",
+    "email": "johx.sdoe@example.com",
+    "password": "my_secure_password"
 }
 
 @userId = {{ createUser.response.body.data.id }}
@@ -23,8 +23,12 @@ GET http://localhost:8080/api/user/{{ userId }}
 PATCH http://localhost:8080/api/user/{{ userId }}
 
 {
-    "first_name": "John",
-    "last_name": "ere",
-    "email": "johdds.doe@example.com",
-    "password": "my_secure_password"
+    "first_name": "Julio",
+    "last_name": "Alves",
+    "email": "julioOlder@example.com",
+    "password": "another_password"
 }
+
+###
+
+DELETE http://localhost:8080/api/user/{{ userId }}

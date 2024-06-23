@@ -1,6 +1,9 @@
 package usecase
 
 import (
+	"errors"
+	"time"
+
 	"github.com/jonattasmoraes/titan/internal/user/domain"
 	dto "github.com/jonattasmoraes/titan/internal/user/domain/DTO"
 	"github.com/jonattasmoraes/titan/internal/user/domain/entities"
@@ -20,19 +23,23 @@ func (u *PatchUserUsecase) Execute(user *entities.User) (*dto.UserResponseDTO, e
 		return nil, err
 	}
 
-	if userExists != nil && userExists.Email == user.Email {
+	if userExists == nil {
+		return nil, errors.New("user not found")
+	}
+
+	if userExists.Email == user.Email {
 		return nil, ErrEmailAlreadyExists
 	}
 
-	updatedUser, err := entities.NewPatchUser(
-		user.FirstName,
-		user.LastName,
-		user.Email,
-		user.Password,
-		user.UpdatedAt,
-	)
-	if err != nil {
-		return nil, err
+	updatedUser := &entities.User{
+		ID:        userExists.ID,
+		FirstName: user.FirstName,
+		LastName:  user.LastName,
+		Email:     user.Email,
+		Password:  userExists.Password,
+		Role:      userExists.Role,
+		CreatedAt: userExists.CreatedAt,
+		UpdatedAt: time.Now(),
 	}
 
 	err = u.repo.PatchUser(updatedUser)
@@ -41,12 +48,12 @@ func (u *PatchUserUsecase) Execute(user *entities.User) (*dto.UserResponseDTO, e
 	}
 
 	response := &dto.UserResponseDTO{
-		ID:        userExists.ID,
+		ID:        updatedUser.ID,
 		FirstName: updatedUser.FirstName,
 		LastName:  updatedUser.LastName,
 		Email:     updatedUser.Email,
-		Role:      userExists.Role,
-		CreateAt:  userExists.CreatedAt.Format("2006-01-02 15:04:05"),
+		Role:      updatedUser.Role,
+		CreateAt:  updatedUser.CreatedAt.Format("2006-01-02 15:04:05"),
 		UpdateAt:  updatedUser.UpdatedAt.Format("2006-01-02 15:04:05"),
 	}
 

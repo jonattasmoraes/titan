@@ -131,13 +131,12 @@ func (h *UserHandler) PatchUser(ctx *gin.Context) {
 		FirstName: request.FirstName,
 		LastName:  request.LastName,
 		Email:     request.Email,
-		Password:  request.Password,
 	}
 
 	response, err := h.patchUser.Execute(user)
 	if err != nil {
-		if err == entities.ErrorValidation(err) {
-			utils.SendError(ctx, http.StatusBadRequest, err.Error())
+		if err == usecase.ErrEmailAlreadyExists {
+			utils.SendError(ctx, http.StatusConflict, err.Error())
 			return
 		}
 

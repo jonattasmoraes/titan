@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/jmoiron/sqlx"
@@ -160,44 +159,32 @@ func (r *repoSqlx) PatchUser(user *entities.User) error {
 		UPDATE users
 		SET `)
 
-	argIndex := 1
-
 	if user.FirstName != "" {
-		query.WriteString(fmt.Sprintf("first_name = $%d, ", argIndex))
+		query.WriteString("first_name = $1, ")
 		args = append(args, user.FirstName)
-		argIndex++
 	}
 
 	if user.LastName != "" {
-		query.WriteString(fmt.Sprintf("last_name = $%d, ", argIndex))
+		query.WriteString("last_name = $2, ")
 		args = append(args, user.LastName)
-		argIndex++
 	}
 
 	if user.Email != "" {
-		query.WriteString(fmt.Sprintf("email = $%d, ", argIndex))
+		query.WriteString("email = $3, ")
 		args = append(args, user.Email)
-		argIndex++
 	}
 
-	if user.Role != "" {
-		query.WriteString(fmt.Sprintf("role = $%d, ", argIndex))
-		args = append(args, user.Role)
-		argIndex++
-	}
-
-	queryStr := query.String()
-	queryStr = queryStr[:len(queryStr)-2]
-
-	queryStr += fmt.Sprintf(`
-		, updated_at = NOW()
-		WHERE id = $%d
+	query.WriteString(`
+		updated_at = NOW()
+		WHERE id = $4
 		AND deleted_at IS NULL
-	`, argIndex)
+	`)
 
 	args = append(args, user.ID)
 
-	_, err := r.writer.Exec(queryStr, args...)
+	finalQuery := strings.TrimSuffix(query.String(), ", ")
+
+	_, err := r.writer.Exec(finalQuery, args...)
 	if err != nil {
 		return err
 	}

@@ -1,6 +1,9 @@
 package repository
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/jmoiron/sqlx"
 
 	"github.com/jonattasmoraes/titan/internal/user/domain"
@@ -142,4 +145,59 @@ func (r *repoSqlx) ListUsers(page int) ([]*entities.User, error) {
 	}
 
 	return users, nil
+}
+
+func (r *repoSqlx) PatchUser(user *entities.User) error {
+	var (
+		query strings.Builder
+		args  []interface{}
+	)
+
+	query.WriteString(`
+		UPDATE users
+		SET `)
+
+	argIndex := 1
+
+	if user.FirstName != "" {
+		query.WriteString(fmt.Sprintf("first_name = $%d, ", argIndex))
+		args = append(args, user.FirstName)
+		argIndex++
+	}
+
+	if user.LastName != "" {
+		query.WriteString(fmt.Sprintf("last_name = $%d, ", argIndex))
+		args = append(args, user.LastName)
+		argIndex++
+	}
+
+	if user.Email != "" {
+		query.WriteString(fmt.Sprintf("email = $%d, ", argIndex))
+		args = append(args, user.Email)
+		argIndex++
+	}
+
+	if user.Role != "" {
+		query.WriteString(fmt.Sprintf("role = $%d, ", argIndex))
+		args = append(args, user.Role)
+		argIndex++
+	}
+
+	queryStr := query.String()
+	queryStr = queryStr[:len(queryStr)-2]
+
+	queryStr += fmt.Sprintf(`
+		, updated_at = NOW()
+		WHERE id = $%d
+		AND deleted_at IS NULL
+	`, argIndex)
+
+	args = append(args, user.ID)
+
+	_, err := r.writer.Exec(queryStr, args...)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

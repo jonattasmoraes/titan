@@ -15,13 +15,20 @@ type UserHandler struct {
 	createUser  *usecase.CreateUserUsecase
 	getUserById *usecase.GetUserByIdUsecase
 	listUsers   *usecase.ListUsersUsecase
+	patchUser   *usecase.PatchUserUsecase
 }
 
-func NewUserHandler(createUser *usecase.CreateUserUsecase, GetUserById *usecase.GetUserByIdUsecase, ListUsers *usecase.ListUsersUsecase) *UserHandler {
+func NewUserHandler(
+	createUser *usecase.CreateUserUsecase,
+	GetUserById *usecase.GetUserByIdUsecase,
+	ListUsers *usecase.ListUsersUsecase,
+	PatchUser *usecase.PatchUserUsecase,
+) *UserHandler {
 	return &UserHandler{
 		createUser:  createUser,
 		getUserById: GetUserById,
 		listUsers:   ListUsers,
+		patchUser:   PatchUser,
 	}
 }
 
@@ -95,4 +102,41 @@ func (h *UserHandler) ListUsers(ctx *gin.Context) {
 	}
 
 	utils.SendSuccess(ctx, "list users", users, http.StatusOK)
+}
+
+func (h *UserHandler) PatchUser(ctx *gin.Context) {
+	var request dto.UserDTO
+
+	id := ctx.Param("id")
+
+	if err := ctx.ShouldBindJSON(&request); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if h.patchUser == nil {
+		utils.SendError(ctx, http.StatusInternalServerError, "patchUser is nil")
+		return
+	}
+
+	user := &entities.User{
+		ID:        id,
+		FirstName: request.FirstName,
+		LastName:  request.LastName,
+		Email:     request.Email,
+		Password:  request.Password,
+	}
+
+	response, err := h.patchUser.Execute(user)
+	if err != nil {
+		if err == entities.ErrorValidation(err) {
+			utils.SendError(ctx, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		utils.SendError(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	utils.SendSuccess(ctx, "patch user", response, http.StatusOK)
 }

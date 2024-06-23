@@ -12,4 +12,6 @@ RUN go install github.com/air-verse/air@latest
 
 COPY . .
 
+WORKDIR /app
+
 CMD ["air"]

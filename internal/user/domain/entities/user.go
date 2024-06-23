@@ -17,6 +17,7 @@ var (
 	ErrPasswordIsRequired  = errors.New("param: 'password' is required, please try again")
 	ErrRoleIsRequired      = errors.New("param: 'role' is required, please try again")
 	ErrIncorrectRole       = errors.New("param: 'role' must be 'admin', 'super' or 'user', please try again")
+	ErrAtLeastOneParam     = errors.New("at least one param is required, please try again")
 )
 
 type User struct {
@@ -38,12 +39,28 @@ func NewUser(id string, firstName string, lastName string, email string, passwor
 		LastName:  lastName,
 		Email:     email,
 		Password:  password,
-		Role:      Role,
+		Role:      "user",
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
 
 	if err := user.Validate(); err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
+func NewPatchUser(firstName string, lastName string, email string, password string, updatedAt time.Time) (*User, error) {
+	user := &User{
+		FirstName: firstName,
+		LastName:  lastName,
+		Email:     email,
+		Password:  password,
+		UpdatedAt: time.Now(),
+	}
+
+	if err := user.Patch(); err != nil {
 		return nil, err
 	}
 
@@ -84,6 +101,22 @@ func (u *User) Validate() error {
 		return ErrorValidation(ErrInvalidEmail)
 	}
 
+	return nil
+}
+
+func (r *User) Patch() error {
+	if r.FirstName == "" && r.LastName == "" && r.Email == "" && r.Password == "" && r.Role == "" {
+		return ErrorValidation(ErrAtLeastOneParam)
+	}
+
+	if r.Role != "" && r.Role != "admin" && r.Role != "super" && r.Role != "user" {
+		return ErrorValidation(ErrIncorrectRole)
+	}
+
+	if r.Email != "" && !IsValidEmail(r.Email) {
+		ErrInvalidEmail := fmt.Errorf("invalid email: %s, please try again with a valid email", r.Email)
+		return ErrorValidation(ErrInvalidEmail)
+	}
 	return nil
 }
 

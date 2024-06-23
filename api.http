@@ -8,9 +8,8 @@ Content-Type: application/json
 {
     "first_name": "John",
     "last_name": "Doe",
-    "email": "joh.doe@example.com",
+    "email": "johx.doe@example.com",
     "password": "my_secure_password",
-    "role": "admin"
 }
 
 @userId = {{ createUser.response.body.data.id }}
@@ -18,3 +17,14 @@ Content-Type: application/json
 ###
 
 GET http://localhost:8080/api/user/{{ userId }}
+
+###
+
+PATCH http://localhost:8080/api/user/{{ userId }}
+
+{
+    "first_name": "John",
+    "last_name": "ere",
+    "email": "johdds.doe@example.com",
+    "password": "my_secure_password"
+}

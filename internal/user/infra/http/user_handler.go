@@ -135,6 +135,10 @@ func (h *UserHandler) PatchUser(ctx *gin.Context) {
 
 	response, err := h.patchUser.Execute(user)
 	if err != nil {
+		if err == usecase.ErrUserNotFound {
+			utils.SendError(ctx, http.StatusNotFound, err.Error())
+			return
+		}
 		if err == usecase.ErrEmailAlreadyExists {
 			utils.SendError(ctx, http.StatusConflict, err.Error())
 			return
@@ -152,6 +156,10 @@ func (h *UserHandler) DeleteUser(ctx *gin.Context) {
 
 	response, err := h.deleteUser.Execute(id)
 	if err != nil {
+		if err == usecase.ErrUserNotFound {
+			utils.SendError(ctx, http.StatusNotFound, err.Error())
+			return
+		}
 		utils.SendError(ctx, http.StatusInternalServerError, err.Error())
 		return
 	}

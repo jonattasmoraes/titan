@@ -1,7 +1,6 @@
 package usecase
 
 import (
-	"errors"
 	"time"
 
 	"github.com/jonattasmoraes/titan/internal/user/domain"
@@ -24,7 +23,7 @@ func (u *PatchUserUsecase) Execute(user *entities.User) (*dto.UserResponseDTO, e
 	}
 
 	if userExists == nil {
-		return nil, errors.New("user not found")
+		return nil, ErrUserNotFound
 	}
 
 	if userExists.Email == user.Email {

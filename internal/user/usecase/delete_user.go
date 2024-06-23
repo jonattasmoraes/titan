@@ -19,6 +19,10 @@ func (u *DeleteUserUsecase) Execute(id string) (*dto.UserResponseDTO, error) {
 		return nil, err
 	}
 
+	if user == nil {
+		return nil, ErrUserNotFound
+	}
+
 	response := &dto.UserResponseDTO{
 		ID:        user.ID,
 		FirstName: user.FirstName,

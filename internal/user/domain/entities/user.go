@@ -18,6 +18,9 @@ var (
 	ErrRoleIsRequired      = errors.New("param: 'role' is required, please try again")
 	ErrIncorrectRole       = errors.New("param: 'role' must be 'admin', 'super' or 'user', please try again")
 	ErrAtLeastOneParam     = errors.New("at least one param is required, please try again")
+	ErrPasswordTooShort    = errors.New("password must be at least 8 characters long, please try again")
+	ErrFirstNameTooShort   = errors.New("first name must be at least 3 characters long, please try again")
+	ErrLastNameTooShort    = errors.New("last name must be at least 3 characters long, please try again")
 )
 
 type User struct {
@@ -32,7 +35,7 @@ type User struct {
 	DeletedAt time.Time
 }
 
-func NewUser(id string, firstName string, lastName string, email string, password string, Role string, createdAt time.Time, updatedAt time.Time) (*User, error) {
+func NewUser(firstName string, lastName string, email string, password string) (*User, error) {
 	user := &User{
 		ID:        ulid.Make().String(),
 		FirstName: firstName,
@@ -51,12 +54,11 @@ func NewUser(id string, firstName string, lastName string, email string, passwor
 	return user, nil
 }
 
-func NewPatchUser(firstName string, lastName string, email string, password string, updatedAt time.Time) (*User, error) {
+func NewPatchUser(firstName string, lastName string, email string) (*User, error) {
 	user := &User{
 		FirstName: firstName,
 		LastName:  lastName,
 		Email:     email,
-		Password:  password,
 		UpdatedAt: time.Now(),
 	}
 
@@ -68,7 +70,7 @@ func NewPatchUser(firstName string, lastName string, email string, password stri
 }
 
 func (u *User) Validate() error {
-	if u.FirstName == "" && u.LastName == "" && u.Email == "" && u.Password == "" && u.Role == "" {
+	if u.FirstName == "" && u.LastName == "" && u.Email == "" && u.Password == "" {
 		return ErrorValidation(ErrAllParamsRequired)
 	}
 
@@ -76,20 +78,24 @@ func (u *User) Validate() error {
 		return ErrorValidation(ErrFirstNameIsRequired)
 	}
 
+	if len(u.FirstName) < 3 {
+		return ErrorValidation(ErrFirstNameTooShort)
+	}
+
 	if u.LastName == "" {
 		return ErrorValidation(ErrLastNameIsRequired)
+	}
+
+	if len(u.LastName) < 3 {
+		return ErrorValidation(ErrLastNameTooShort)
 	}
 
 	if u.Password == "" {
 		return ErrorValidation(ErrPasswordIsRequired)
 	}
 
-	if u.Role == "" {
-		return ErrorValidation(ErrRoleIsRequired)
-	}
-
-	if u.Role != "admin" && u.Role != "super" && u.Role != "user" {
-		return ErrorValidation(ErrIncorrectRole)
+	if len(u.Password) <= 8 {
+		return ErrorValidation(ErrPasswordTooShort)
 	}
 
 	if u.Email == "" {
@@ -105,12 +111,16 @@ func (u *User) Validate() error {
 }
 
 func (r *User) Patch() error {
-	if r.FirstName == "" && r.LastName == "" && r.Email == "" && r.Password == "" && r.Role == "" {
+	if r.FirstName == "" && r.LastName == "" && r.Email == "" {
 		return ErrorValidation(ErrAtLeastOneParam)
 	}
 
-	if r.Role != "" && r.Role != "admin" && r.Role != "super" && r.Role != "user" {
-		return ErrorValidation(ErrIncorrectRole)
+	if r.FirstName != "" && len(r.FirstName) < 3 {
+		return ErrorValidation(ErrFirstNameTooShort)
+	}
+
+	if r.LastName != "" && len(r.LastName) < 3 {
+		return ErrorValidation(ErrLastNameTooShort)
 	}
 
 	if r.Email != "" && !IsValidEmail(r.Email) {

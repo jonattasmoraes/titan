@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/jmoiron/sqlx"
-
 	"github.com/jonattasmoraes/titan/internal/user/domain"
 	"github.com/jonattasmoraes/titan/internal/user/domain/entities"
 )
@@ -29,8 +28,6 @@ func (r *repoSqlx) CreateUser(user *entities.User) error {
 	if err != nil {
 		return err
 	}
-
-	defer r.writer.Close()
 
 	return nil
 }
@@ -83,11 +80,9 @@ func (r *repoSqlx) FindUserByEmail(email string) (*entities.User, error) {
 	`
 
 	rows, err := r.reader.Query(query, email)
-
 	if err != nil {
 		return nil, err
 	}
-
 	defer rows.Close()
 
 	var user entities.User
@@ -103,7 +98,6 @@ func (r *repoSqlx) FindUserByEmail(email string) (*entities.User, error) {
 			&user.CreatedAt,
 			&user.UpdatedAt,
 		)
-
 		if err != nil {
 			return nil, err
 		}
@@ -126,7 +120,6 @@ func (r *repoSqlx) ListUsers(page int) ([]*entities.User, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	defer rows.Close()
 
 	var users []*entities.User
@@ -197,8 +190,6 @@ func (r *repoSqlx) PatchUser(user *entities.User) error {
 		return err
 	}
 
-	defer r.writer.Close()
-
 	return nil
 }
 
@@ -213,8 +204,6 @@ func (r *repoSqlx) DeleteUser(id string) error {
 	if err != nil {
 		return err
 	}
-
-	defer r.writer.Close()
 
 	return nil
 }

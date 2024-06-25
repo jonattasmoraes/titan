@@ -30,6 +30,8 @@ func (r *repoSqlx) CreateUser(user *entities.User) error {
 		return err
 	}
 
+	defer r.writer.Close()
+
 	return nil
 }
 
@@ -195,6 +197,8 @@ func (r *repoSqlx) PatchUser(user *entities.User) error {
 		return err
 	}
 
+	defer r.writer.Close()
+
 	return nil
 }
 
@@ -209,6 +213,8 @@ func (r *repoSqlx) DeleteUser(id string) error {
 	if err != nil {
 		return err
 	}
+
+	defer r.writer.Close()
 
 	return nil
 }

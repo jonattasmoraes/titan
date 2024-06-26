@@ -38,14 +38,11 @@ func TestCreateUser(t *testing.T) {
 	mockRepo.On("CreateUser", mock.AnythingOfType("*entities.User")).Return(nil)
 
 	// Define the user DTO to be passed to the usecase.
-	response := &dto.UserDTO{
+	response := &dto.UserRequestDTO{
 		FirstName: "Peter",
 		LastName:  "Parker",
 		Email:     "peter.parker@example.com",
 		Password:  "12345678",
-		Role:      "user",
-		CreateAt:  time.Now().String(),
-		UpdateAt:  time.Now().String(),
 	}
 
 	// Execute the usecase with the defined user DTO.
@@ -58,9 +55,6 @@ func TestCreateUser(t *testing.T) {
 	assert.Equal(t, userDTO.FirstName, response.FirstName)
 	assert.Equal(t, userDTO.LastName, response.LastName)
 	assert.Equal(t, userDTO.Email, response.Email)
-	assert.Equal(t, userDTO.Role, response.Role)
-	assert.NotEmpty(t, response.CreateAt)
-	assert.NotEmpty(t, response.UpdateAt)
 
 	// Assert that all expected methods of the mock repository were called.
 	mockRepo.AssertExpectations(t)

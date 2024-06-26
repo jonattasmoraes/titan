@@ -21,29 +21,32 @@ type UserHandler struct {
 
 func NewUserHandler(
 	createUser *usecase.CreateUserUsecase,
-	GetUserById *usecase.GetUserByIdUsecase,
-	ListUsers *usecase.ListUsersUsecase,
-	PatchUser *usecase.PatchUserUsecase,
-	DeleteUser *usecase.DeleteUserUsecase,
+	getUserById *usecase.GetUserByIdUsecase,
+	listUsers *usecase.ListUsersUsecase,
+	patchUser *usecase.PatchUserUsecase,
+	deleteUser *usecase.DeleteUserUsecase,
 ) *UserHandler {
 	return &UserHandler{
 		createUser:  createUser,
-		getUserById: GetUserById,
-		listUsers:   ListUsers,
-		patchUser:   PatchUser,
-		deleteUser:  DeleteUser,
+		getUserById: getUserById,
+		listUsers:   listUsers,
+		patchUser:   patchUser,
+		deleteUser:  deleteUser,
 	}
 }
 
-// @BasePath /api/users
-// @Summary Create User
-// @Description POST endpoint of the application that creates new users in the database.
 // @Tags Users
-// @Accept json
-// @Produce jsons
-// @Router /users [post]
+// @Summary Create a new user
+// @Description Create a new user with the input payload
+// @Accept  json
+// @Produce  json
+// @Param user body dto.UserRequestDTO true "User"
+// @Success 201 {object} dto.UserResponseDTO
+// @Failure 400 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
+// @Router /user [post]
 func (h *UserHandler) CreateUser(ctx *gin.Context) {
-	var request dto.UserDTO
+	var request dto.UserRequestDTO
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -74,6 +77,16 @@ func (h *UserHandler) CreateUser(ctx *gin.Context) {
 	utils.SendSuccess(ctx, "create user", user, http.StatusCreated)
 }
 
+// @Tags Users
+// @Summary Get user by id
+// @Description Get user by id
+// @Accept  json
+// @Produce  json
+// @Param id path string true "User ID"
+// @Success 200 {object} dto.UserResponseDTO
+// @Failure 404 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
+// @Router /user/{id} [get]
 func (h *UserHandler) GetUserById(ctx *gin.Context) {
 	id := ctx.Param("id")
 
@@ -90,6 +103,16 @@ func (h *UserHandler) GetUserById(ctx *gin.Context) {
 	utils.SendSuccess(ctx, "get user by id", request, http.StatusOK)
 }
 
+// @Tags Users
+// @Summary List users
+// @Description List users
+// @Accept  json
+// @Produce  json
+// @Param page query int true "Page number"
+// @Success 200 {array} dto.UserResponseDTO
+// @Failure 400 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
+// @Router /users [get]
 func (h *UserHandler) ListUsers(ctx *gin.Context) {
 	request := ctx.DefaultQuery("page", "1")
 
@@ -118,8 +141,20 @@ func (h *UserHandler) ListUsers(ctx *gin.Context) {
 	utils.SendSuccess(ctx, "list users", users, http.StatusOK)
 }
 
+// @Tags Users
+// @Summary Patch user
+// @Description Patch user
+// @Accept  json
+// @Produce  json
+// @Param id path string true "User ID"
+// @Param user body dto.UserDTO true "User"
+// @Success 200 {object} dto.UserResponseDTO
+// @Failure 404 {object} dto.ErrorResponse
+// @Failure 409 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
+// @Router /user/{id} [patch]
 func (h *UserHandler) PatchUser(ctx *gin.Context) {
-	var request dto.UserDTO
+	var request dto.PatchRequestDTO
 
 	id := ctx.Param("id")
 
@@ -158,6 +193,16 @@ func (h *UserHandler) PatchUser(ctx *gin.Context) {
 	utils.SendSuccess(ctx, "patch user", response, http.StatusOK)
 }
 
+// @Tags Users
+// @Summary Delete user
+// @Description Delete user
+// @Accept  json
+// @Produce  json
+// @Param id path string true "User ID"
+// @Success 204
+// @Failure 404 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
+// @Router /user/{id} [delete]
 func (h *UserHandler) DeleteUser(ctx *gin.Context) {
 	id := ctx.Param("id")
 

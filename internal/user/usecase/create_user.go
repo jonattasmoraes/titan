@@ -18,7 +18,7 @@ func NewCreateUserUsecase(repo domain.UserRepository) *CreateUserUsecase {
 	return &CreateUserUsecase{repo: repo}
 }
 
-func (u *CreateUserUsecase) Execute(user *dto.UserDTO) (*dto.UserResponseDTO, error) {
+func (u *CreateUserUsecase) Execute(user *dto.UserRequestDTO) (*dto.UserResponseDTO, error) {
 	userExists, err := u.repo.FindUserByEmail(user.Email)
 
 	if err != nil {

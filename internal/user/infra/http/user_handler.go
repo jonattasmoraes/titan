@@ -35,6 +35,13 @@ func NewUserHandler(
 	}
 }
 
+// @BasePath /api/users
+// @Summary Create User
+// @Description POST endpoint of the application that creates new users in the database.
+// @Tags Users
+// @Accept json
+// @Produce jsons
+// @Router /users [post]
 func (h *UserHandler) CreateUser(ctx *gin.Context) {
 	var request dto.UserDTO
 

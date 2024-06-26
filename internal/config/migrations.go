@@ -19,7 +19,7 @@ func StartMigrations(db *sqlx.DB) error {
 	log.Printf("Migrations path: %s", "file://migrations")
 
 	m, err := migrate.NewWithDatabaseInstance(
-		"file://migrations",
+		"file://schemas",
 		"postgres", driver)
 	if err != nil {
 		log.Fatalf("could not create migrate instance: %v", err)

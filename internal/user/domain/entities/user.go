@@ -94,7 +94,7 @@ func (u *User) Validate() error {
 		return ErrorValidation(ErrPasswordIsRequired)
 	}
 
-	if len(u.Password) <= 8 {
+	if len(u.Password) < 8 {
 		return ErrorValidation(ErrPasswordTooShort)
 	}
 

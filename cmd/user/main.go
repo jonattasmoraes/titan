@@ -5,7 +5,7 @@ import (
 
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/joho/godotenv"
-	"github.com/jonattasmoraes/titan/internal/user/config"
+	"github.com/jonattasmoraes/titan/internal/config"
 	"github.com/jonattasmoraes/titan/internal/user/infra/http"
 	"github.com/jonattasmoraes/titan/internal/user/infra/repository"
 	"github.com/jonattasmoraes/titan/internal/user/infra/server"

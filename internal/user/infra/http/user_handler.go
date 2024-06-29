@@ -53,11 +53,6 @@ func (h *UserHandler) CreateUser(ctx *gin.Context) {
 		return
 	}
 
-	if h.createUser == nil {
-		utils.SendError(ctx, http.StatusInternalServerError, "createUser is nil")
-		return
-	}
-
 	user, err := h.createUser.Execute(&request)
 	if err != nil {
 		if err == entities.ErrorValidation(err) {

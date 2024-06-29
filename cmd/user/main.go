@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"os"
 
 	_ "github.com/golang-migrate/migrate/v4/source/file"
@@ -16,19 +17,19 @@ import (
 func main() {
 	err := godotenv.Load()
 	if err != nil {
-		panic(err)
+		log.Fatalf("Error loading .env file: %v", err)
 	}
 
 	dsn := os.Getenv("DSN")
 
 	writer, err := config.GetWriterSqlx(dsn)
 	if err != nil {
-		panic(err)
+		log.Fatalf("Failed to get writer: %v", err)
 	}
 
 	reader, err := config.GetReaderSqlx(dsn)
 	if err != nil {
-		panic(err)
+		log.Fatalf("Failed to get reader: %v", err)
 	}
 
 	defer writer.Close()
@@ -49,7 +50,16 @@ func main() {
 		getUserById,
 		listUsers,
 		patchUser,
-		deleteUser)
+		deleteUser,
+	)
 
-	server.StartServer(userHandlers)
+	go func() {
+		server.StartServer(userHandlers)
+	}()
+
+	go func() {
+		server.StartGrpcServer(getUserById)
+	}()
+
+	select {}
 }

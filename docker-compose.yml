@@ -1,29 +1,37 @@
-version: '4.0'
+version: '3.8'
 
 services:
 
-  server:
+  titan:
     build: .
     ports:
       - "8080:8080"
-      - "50051:50051" 
+      - "50051:50051"
     volumes:
       - .:/app
     command: air
     depends_on:
       - postgres
+    networks:
+      - minha-rede
 
   postgres:
     image: postgres:13
-    container_name: postgres
+    container_name: titan_postgres
     ports:
-      - "5432:5432"
+      - "5431:5432"
     environment:
-      POSTGRES_DB: postgres
+      POSTGRES_DB: titan
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - titan_postgres_data:/var/lib/postgresql/data
+    networks:
+      - minha-rede
 
 volumes:
-  postgres_data:
+  titan_postgres_data:
+
+networks:
+  minha-rede:
+    external: true
